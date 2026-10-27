@@ -1,0 +1,17 @@
+# Python ortamı ve geçici dosyalar
+.venv/
+__pycache__/
+*.pyc
+
+# OpenStreetMap önbelleği (her bilgisayarda kendiliğinden oluşur)
+cache/
+
+# Üretilen dosyalar
+cikti/
+sunucu_cikti/
+
+# Kişisel bina adı dosyası (şablonu bina_adlari_ornek.csv)
+bina_adlari.csv
+
+# Office geçici dosyaları
+~$*

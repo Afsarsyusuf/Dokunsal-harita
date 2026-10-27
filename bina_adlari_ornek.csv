@@ -1,0 +1,8 @@
+# Bina adı dosyası. Kullanmak için bu dosyanın adını bina_adlari.csv yap.
+# Her satır: enlem,boylam,ad
+# Enlem ve boylam: binanın içinde herhangi bir nokta (Google Haritalar'da binaya sağ tıkla, ilk satırdaki sayılar).
+# Ad: haritada görünecek kısa ad. Anahtarlar bu dosyadaki sırayla verilir (ilk satır a, ikinci b...).
+# '#' ile başlayan satırlar dikkate alınmaz.
+enlem,boylam,ad
+39.77380,34.79512,mühendislik fakültesi
+39.77455,34.79690,merkez kütüphane

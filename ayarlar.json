@@ -1,0 +1,59 @@
+{
+  "_aciklama": "Tum olculer baski uzerindeki milimetre (mm) cinsindendir. Degerler baslangic onerisidir; test baskilarina gore guncellenecektir. harita_mm: harita alaninin kenari; plaka = harita + cerceve, ustte kuzey isareti ve baslik icin bant.",
+  "alan_m": 400,
+  "harita_mm": 170,
+  "ust_bant_mm": 12,
+  "taban_kalinlik_mm": 3.0,
+  "cerceve_genislik_mm": 2.0,
+  "cerceve_yukseklik_mm": 1.5,
+  "kuzey_isareti": true,
+  "bina_yukseklik_mm": 3.0,
+  "bina_birlestirme_mm": 1.0,
+  "sadelestirme_tolerans_mm": 0.4,
+  "min_bina_alan_mm2": 16.0,
+  "bina_yol_boslugu_mm": 1.0,
+  "arac_yolu_derinlik_mm": 1.0,
+  "ana_yol_genislik_mm": 2.5,
+  "tali_yol_genislik_mm": 1.8,
+  "yol_birlestirme_mm": 1.5,
+  "yaya_yolu_yukseklik_mm": 0.8,
+  "yaya_yolu_genislik_mm": 1.0,
+  "yol_siniflari": {
+    "ana": [
+      "motorway",
+      "trunk",
+      "primary",
+      "secondary",
+      "tertiary",
+      "motorway_link",
+      "trunk_link",
+      "primary_link",
+      "secondary_link",
+      "tertiary_link"
+    ],
+    "tali": [
+      "residential",
+      "unclassified",
+      "service",
+      "living_street",
+      "road"
+    ],
+    "yaya": [
+      "footway",
+      "path",
+      "pedestrian",
+      "steps",
+      "cycleway",
+      "track"
+    ]
+  },
+  "braille_nokta_cap_mm": 1.6,
+  "braille_nokta_yukseklik_mm": 0.6,
+  "braille_nokta_aralik_mm": 2.5,
+  "braille_hucre_aralik_mm": 6.2,
+  "braille_satir_aralik_mm": 10.0,
+  "bina_anahtarlari": true,
+  "anahtar_kenar_boslugu_mm": 1.0,
+  "osm_adlarini_kullan": true,
+  "ad_eslesme_toleransi_m": 5
+}
