@@ -8,6 +8,7 @@ backend/cache/
 backend/cikti/
 backend/sunucu_cikti/
 backend/bina_adlari.csv
+backend/haritalar.db
 
 # Frontend
 node_modules/

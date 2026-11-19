@@ -95,6 +95,10 @@ Web arayüzü motoru bu sunucu üzerinden kullanır. Ayrıntılı belge: `API_BE
   (Her uç noktayı "Try it out" düğmesiyle deneyebilirsin. İnternetsiz deneme için isteğe `"ornek_veri": true` ekle.)
 - Depodaki `frontend/` klasöründe `index.html` varsa web arayüzü de aynı adresten açılır: http://127.0.0.1:8000
 - Üretilen dosyalar `sunucu_cikti/` klasörüne kaydedilir.
+- Her haritanın bilgileri `haritalar.db` (SQLite) dosyasına kaydedilir. Ayrı bir veritabanı sunucusu ya da kurulum gerekmez; dosya ilk haritada kendiliğinden oluşur.
+  - Önceki haritaları listelemek ve aramak: `GET /api/haritalar?ara=kampüs`
+  - Silmek: `DELETE /api/harita/{id}`
+  - Aynı yer ve ayarlarla tekrar istek gelirse harita baştan üretilmez, kayıtlı olan hemen döner. Yeniden üretmek için istekte `"yeniden_uret": true`.
 - Sunucuyu durdurmak için komut satırında Ctrl+C.
 
 ## Bina adı dosyası
@@ -158,6 +162,7 @@ backend/
 ├── bina_adlari_ornek.csv  Bina adı dosyası şablonu
 ├── requirements.txt    Gerekli kütüphaneler
 ├── sunucu.py           Web sunucusu (FastAPI)
+├── veritabani.py       Üretilen haritaların kaydı (SQLite, haritalar.db)
 ├── API_BELGESI.docx    Web arayüzü için API belgesi (Kader)
 ├── motor/
 │   ├── __main__.py     Komut satırı (programı başlatan dosya)

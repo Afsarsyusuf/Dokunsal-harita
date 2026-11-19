@@ -10,12 +10,14 @@ Web arayüzü bu sunucuya JSON ile istek gönderir. Ayrıntılar: API_BELGESI.do
 """
 
 import json
+import shutil
 import threading
 import uuid
+from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -24,8 +26,9 @@ from pydantic import BaseModel, Field
 
 from motor import braille, veri
 from motor.uretim import KOK, ayarlari_yukle, harita_uret
+import veritabani as vt
 
-SURUM = "0.4"
+SURUM = "0.5"
 CIKTI = KOK / "sunucu_cikti"
 ORNEK_VERI = KOK / "ornek" / "ornek_veri.geojson"
 DOSYA_TURLERI = {
@@ -112,6 +115,7 @@ class HaritaIstegi(BaseModel):
     bina_adlari: list[BinaAdi] = Field(default_factory=list, description="Binalara verilecek adlar. Sırayla a, b, c... anahtarlarını alır.")
     ayarlar: dict = Field(default_factory=dict, description="İsteğe bağlı ölçü değişiklikleri (ör. {\"bina_yukseklik_mm\": 3.5}).")
     ornek_veri: bool = Field(False, description="true: internet kullanmadan yapay örnek veriyle üretir (geliştirme ve test için).")
+    yeniden_uret: bool = Field(False, description="true: aynı istekle daha önce üretilmiş harita olsa bile baştan üretir.")
 
 
 class BrailleIstegi(BaseModel):
@@ -181,13 +185,23 @@ def harita(istek: HaritaIstegi):
     except KeyError as e:
         _hata(400, "gecersiz_ayar", str(e).strip("'\""))
 
+    bina_adlari = [(b.enlem, b.boylam, b.ad) for b in istek.bina_adlari]
+    anahtar = vt.istek_anahtari(enlem, boylam, istek.alan_m, istek.baslik, bina_adlari,
+                                istek.ayarlar, istek.ornek_veri)
+
+    # Aynı istekle daha önce üretilmiş harita varsa baştan üretmek yerine onu döndür.
+    if not istek.yeniden_uret:
+        kayitli = vt.istekle_bul(anahtar)
+        if kayitli and (CIKTI / kayitli["id"]).exists():
+            return {**kayitli, "onceden_uretildi": True}
+
     harita_id = uuid.uuid4().hex[:12]
     klasor = CIKTI / harita_id
     with _kilit:
         try:
             sonuc = harita_uret(
                 klasor, enlem=enlem, boylam=boylam, alan_m=istek.alan_m, baslik=istek.baslik,
-                bina_adlari=[(b.enlem, b.boylam, b.ad) for b in istek.bina_adlari],
+                bina_adlari=bina_adlari,
                 geojson=geojson, ayar=ayar, dosya_adi="harita",
             )
         except RuntimeError as e:  # OpenStreetMap'e ulaşılamadı
@@ -198,6 +212,8 @@ def harita(istek: HaritaIstegi):
     cevap = {
         "id": harita_id,
         "durum": "tamam",
+        "olusturma": datetime.now().isoformat(timespec="seconds"),
+        "yer": istek.yer,
         "ozet": sonuc["ozet"],
         "baslik": sonuc["baslik"],
         "baslik_braille": sonuc["baslik_braille"],
@@ -207,15 +223,38 @@ def harita(istek: HaritaIstegi):
         "dosyalar": _dosya_adresleri(harita_id, sonuc["dosyalar"]),
     }
     (klasor / "sonuc.json").write_text(json.dumps(cevap, ensure_ascii=False, indent=2), encoding="utf-8")
-    return cevap
+    vt.kaydet(cevap, yer=istek.yer, anahtar=anahtar)
+    return {**cevap, "onceden_uretildi": False}
+
+
+@app.get("/api/haritalar", summary="Daha önce üretilen haritaları listele / ara")
+def haritalar(
+    ara: Optional[str] = Query(None, max_length=80, description="Yer adı, başlık veya bina adında aranacak metin."),
+    adet: int = Query(20, ge=1, le=100, description="En fazla kaç kayıt döneceği."),
+    atla: int = Query(0, ge=0, description="Sayfalama için baştan atlanacak kayıt sayısı."),
+):
+    toplam, liste = vt.listele(ara=ara, adet=adet, atla=atla)
+    return {"toplam": toplam, "haritalar": liste}
 
 
 @app.get("/api/harita/{harita_id}", summary="Daha önce üretilen haritanın bilgileri")
 def harita_bilgisi(harita_id: str):
-    yol = CIKTI / harita_id / "sonuc.json"
-    if not harita_id.isalnum() or not yol.exists():
+    kayit = vt.getir(harita_id) if harita_id.isalnum() else None
+    if not kayit:
         _hata(404, "harita_bulunamadi", "Bu kimlikle üretilmiş bir harita yok.")
-    return json.loads(yol.read_text(encoding="utf-8"))
+    return kayit
+
+
+@app.delete("/api/harita/{harita_id}", summary="Haritayı ve dosyalarını sil")
+def harita_sil(harita_id: str):
+    if not harita_id.isalnum() or not vt.sil(harita_id):
+        _hata(404, "harita_bulunamadi", "Bu kimlikle üretilmiş bir harita yok.")
+    shutil.rmtree(CIKTI / harita_id, ignore_errors=True)
+    return {"id": harita_id, "durum": "silindi"}
+
+
+# Veritabanı eklenmeden önce üretilmiş haritalar varsa kayda al.
+vt.eski_ciktilari_ekle(CIKTI)
 
 
 @app.get("/api/harita/{harita_id}/dosya/{tur}", summary="Üretilen dosyayı indir")
