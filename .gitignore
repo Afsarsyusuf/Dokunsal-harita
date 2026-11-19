@@ -1,17 +1,16 @@
-# Python ortamı ve geçici dosyalar
+# Python
 .venv/
 __pycache__/
 *.pyc
 
-# OpenStreetMap önbelleği (her bilgisayarda kendiliğinden oluşur)
-cache/
+# Backend çıktıları ve önbellek
+backend/cache/
+backend/cikti/
+backend/sunucu_cikti/
+backend/bina_adlari.csv
 
-# Üretilen dosyalar
-cikti/
-sunucu_cikti/
-
-# Kişisel bina adı dosyası (şablonu bina_adlari_ornek.csv)
-bina_adlari.csv
+# Frontend
+node_modules/
 
 # Office geçici dosyaları
 ~$*

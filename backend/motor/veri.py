@@ -8,6 +8,7 @@ Açık Overpass sunucuları zaman zaman yoğun olur. Bu yüzden istek başarıs�
 bekleyip yeniden denenir ve sırayla alternatif sunuculara geçilir.
 """
 
+import json
 import time
 import geopandas as gpd
 
@@ -60,10 +61,11 @@ def yer_adindan_koordinat(yer_adi):
 
 def geojson_dan_oku(dosya_yolu):
     """GeoJSON dosyasını okur. Koordinatlar WGS84 (enlem/boylam) olmalıdır."""
-    gdf = gpd.read_file(dosya_yolu)
-    if gdf.crs is None:
-        gdf = gdf.set_crs("EPSG:4326")
-    return gdf
+    # Dosya doğrudan JSON olarak okunur; böylece GDAL kütüphanesine gerek kalmaz
+    # (bazı Windows kurulumlarında GDAL eksik olduğu için gpd.read_file çalışmıyor).
+    with open(dosya_yolu, encoding="utf-8") as f:
+        veri = json.load(f)
+    return gpd.GeoDataFrame.from_features(veri["features"], crs="EPSG:4326")
 
 
 def bina_adlarini_oku(dosya_yolu):

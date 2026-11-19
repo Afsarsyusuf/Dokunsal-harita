@@ -229,3 +229,16 @@ def dosya(harita_id: str, tur: str):
         _hata(404, "dosya_bulunamadi", "Bu harita için bu dosya yok (ör. anahtar yoksa lejant üretilmez).")
     indirme_adi = f"dokunsal_harita_{harita_id}_{adlar[tur]}"
     return FileResponse(yol, media_type=DOSYA_TURLERI[tur], filename=indirme_adi)
+
+
+# ---------- Web arayüzü ----------
+# Depodaki frontend/ klasöründe index.html varsa site de bu sunucudan açılır: http://127.0.0.1:8000
+# (Arayüz derleme aracı kullanıyorsa frontend/dist/ klasörü tercih edilir.)
+# /api/... adresleri ve /docs sayfası bundan etkilenmez.
+from fastapi.staticfiles import StaticFiles
+
+_ARAYUZ = KOK.parent / "frontend"
+for _klasor in (_ARAYUZ / "dist", _ARAYUZ):
+    if (_klasor / "index.html").exists():
+        app.mount("/", StaticFiles(directory=_klasor, html=True), name="arayuz")
+        break
