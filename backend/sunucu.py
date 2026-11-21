@@ -137,10 +137,10 @@ def ayarlar():
 @app.get("/api/konum", summary="Yer adını koordinata çevir")
 def konum(yer: str):
     try:
-        enlem, boylam = veri.yer_adindan_koordinat(yer)
+        enlem, boylam, bulunan = veri.yer_bul(yer)
     except Exception:
-        _hata(404, "yer_bulunamadi", f"'{yer}' için konum bulunamadı.")
-    return {"yer": yer, "enlem": enlem, "boylam": boylam}
+        _hata(404, "yer_bulunamadi", f"'{yer}' için konum bulunamadı. Adı daha ayrıntılı yazmayı deneyin (ör. ilçe ve şehir ekleyin).")
+    return {"yer": yer, "enlem": enlem, "boylam": boylam, "bulunan": bulunan}
 
 
 @app.post("/api/braille", summary="Metni Braille'e çevir (önizleme)")

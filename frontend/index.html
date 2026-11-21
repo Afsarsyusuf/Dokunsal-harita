@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Dokun & Dinle - erişilebilir dokunsal ve sesli harita oluşturma platformu.">
+  <meta name="description" content="Dokun & Dinle - görme engelli bireyler için sesli kullanılabilen, 3D basılabilir dokunsal harita oluşturma platformu.">
   <title>Dokun & Dinle | Erişilebilir Haritalar</title>
   <style>
     :root {
@@ -13,17 +13,17 @@
       --shadow: 0 12px 35px rgba(24,59,59,.08);
     }
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; scroll-padding-top: 110px; }
     body { margin: 0; font-family: Arial, Helvetica, sans-serif; color: var(--ink); background: var(--paper); line-height: 1.6; }
     a { color: inherit; }
-    button, input, select { font: inherit; }
+    button, input, select, textarea { font: inherit; }
     button { cursor: pointer; }
-    :focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+    :focus-visible { outline: 3px solid #0b2e33; outline-offset: 2px; box-shadow: 0 0 0 6px #ffd166; }
     .skip-link { position: absolute; left: 12px; top: -60px; z-index: 100; background: #fff; padding: 10px 14px; border-radius: 8px; }
     .skip-link:focus { top: 12px; }
     .reader-toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:9px; padding:12px max(20px, calc((100% - 1120px) / 2)); background:#e8f2ed; border-bottom:1px solid var(--line); }
     .reader-toolbar strong { margin-right:5px; }
-    .reader-toolbar button, .reader-toolbar select { min-height:40px; border:1px solid #9bb8ad; border-radius:8px; background:#fff; color:var(--ink); padding:7px 11px; }
+    .reader-toolbar button, .reader-toolbar select { min-height:40px; border:1px solid #6b8580; border-radius:8px; background:#fff; color:var(--ink); padding:7px 11px; }
     .reader-toolbar button:disabled { opacity:.55; cursor:not-allowed; }
     .reader-status { flex-basis:100%; margin:0; color:var(--muted); font-size:.85rem; }
     .container { width: min(1120px, calc(100% - 40px)); margin: auto; }
@@ -60,18 +60,18 @@
     .step-title p { margin: 2px 0 0; color: var(--muted); font-size: .9rem; }
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .field { display: block; margin-bottom: 15px; font-weight: 700; font-size: .92rem; }
-    .field input, .field select { display: block; width: 100%; margin-top: 6px; border: 1px solid #bdcec7; border-radius: 9px; background: white; padding: 11px 12px; color: var(--ink); min-height: 46px; }
-    .field input::placeholder { color: #71817d; }
+    .field input, .field select { display: block; width: 100%; margin-top: 6px; border: 1px solid #6b8580; border-radius: 9px; background: white; padding: 11px 12px; color: var(--ink); min-height: 46px; }
+    .field input::placeholder { color: #5d706d; }
     fieldset { border: 0; margin: 0 0 20px; padding: 0; }
     legend { font-weight: 700; margin-bottom: 10px; }
     .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
     .check-item { display: flex; gap: 10px; align-items: center; border: 1px solid var(--line); padding: 10px; border-radius: 9px; font-size: .9rem; cursor: pointer; }
     .check-item input { width: 18px; height: 18px; accent-color: var(--teal); }
-    .option { display: flex; gap: 11px; align-items: flex-start; padding: 12px; border: 1px solid var(--line); border-radius: 10px; margin: 9px 0; }
+    .option { display: flex; gap: 11px; align-items: flex-start; padding: 12px; border: 1px solid #6b8580; border-radius: 10px; margin: 9px 0; }
     .option input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--teal); }
     .option small { display: block; color: var(--muted); }
     .status { min-height: 24px; color: var(--teal-dark); font-size: .9rem; margin: 10px 0 0; }
-    .map-card { position: sticky; top: 95px; }
+    .map-card { align-self: start; }
     .map-canvas { overflow: hidden; border-radius: 12px; background: #edf1e9; }
     .map-canvas svg { display: block; width: 100%; height: auto; }
     .map-caption { color: var(--muted); font-size: .8rem; margin: 9px 0 17px; }
@@ -102,6 +102,67 @@
     .high-contrast { --ink: #000; --teal: #004b45; --teal-dark: #00352f; --paper: #fff; --muted: #222; --line: #555; --mint: #e4e4e4; }
     .high-contrast .hero { background: #000; }
     .high-contrast .card, .high-contrast .feature-card, .high-contrast .process-card { border: 2px solid #000; }
+
+    /* ---- Backend bağlantısı ve ses katmanı için eklenenler ---- */
+    [hidden] { display: none !important; }
+    .reader-toolbar .arac-grup { display:flex; flex-wrap:wrap; align-items:center; gap:9px; }
+    .reader-toolbar .ayirac { width:1px; align-self:stretch; background:#9bb8ad; margin:0 4px; }
+    .reader-toolbar button[aria-pressed="true"] { background: var(--teal); color: #fff; border-color: var(--teal); }
+    .kisayollar { flex-basis:100%; font-size:.85rem; color: var(--muted); }
+    .kisayollar summary { cursor: pointer; font-weight: 700; color: var(--ink); }
+    .kisayollar ul { margin: 6px 0 0; padding-left: 20px; }
+    kbd { font-family: inherit; font-weight: 700; border: 1px solid #6b8580; border-bottom-width: 2px; border-radius: 5px; padding: 0 5px; background: #fff; }
+    .ipucu { display:block; font-weight: 400; color: var(--muted); font-size: .85rem; margin-top: 3px; }
+    .hata { display:block; color: #a1261b; font-weight: 700; font-size: .88rem; min-height: 0; }
+    .hata:empty { display: none; }
+    [aria-invalid="true"] { border-color: #a1261b !important; border-width: 2px !important; }
+    .konum-satiri { display:flex; gap:10px; align-items:flex-end; }
+    .konum-satiri .field { flex: 1; margin-bottom: 0; }
+    .konum-satiri .button { min-height: 46px; }
+    .bulunan { margin: 8px 0 15px; color: var(--teal-dark); font-weight: 700; font-size: .92rem; }
+    .bulunan:empty { margin: 0 0 15px; }
+    details.koordinat, details.gelismis { border: 1px solid #6b8580; border-radius: 10px; padding: 10px 12px; margin: 0 0 18px; }
+    details summary { cursor: pointer; font-weight: 700; }
+    details[open] summary { margin-bottom: 10px; }
+    output.braille-cikti { display:block; font-weight:400; font-size:.9rem; color: var(--teal-dark); margin-top: 6px; min-height: 1.2em; }
+    .bina-listesi { list-style:none; margin: 0 0 10px; padding: 0; }
+    .bina-satiri { display:grid; grid-template-columns: 1.4fr 1fr 1fr auto; gap: 10px; align-items: end; border-bottom: 1px solid var(--line); padding-bottom: 8px; margin-bottom: 10px; }
+    .bina-satiri .field { margin-bottom: 0; }
+    .bina-satiri .button { min-height: 46px; padding: 10px 12px; }
+    .form-alt { display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-top: 8px; }
+    .onizleme-resmi { display:block; width:100%; height:auto; background:#fff; }
+    .sonuc { margin-top: 4px; }
+    .sonuc h3 { margin: 0 0 8px; font-size: 1.15rem; }
+    .sonuc h4 { margin: 18px 0 8px; font-size: 1rem; }
+    .sonuc-aciklama { background:#f2f7f4; border:1px solid var(--line); border-radius: 11px; padding: 12px 14px; margin: 0 0 12px; }
+    .ozet-listesi { display:grid; grid-template-columns: auto 1fr; gap: 4px 14px; margin: 0 0 14px; font-size: .93rem; }
+    .ozet-listesi dt { font-weight: 700; }
+    .ozet-listesi dd { margin: 0; }
+    .anahtar-tablosu { width:100%; border-collapse: collapse; margin: 0 0 12px; font-size: .93rem; }
+    .anahtar-tablosu caption { text-align:left; font-weight:700; margin-bottom: 6px; }
+    .anahtar-tablosu th, .anahtar-tablosu td { border: 1px solid #9bb0aa; padding: 6px 9px; text-align: left; }
+    .anahtar-tablosu th { background: var(--mint); }
+    .uyarilar { border-left: 4px solid #b86e00; background:#fff7e8; padding: 8px 12px; border-radius: 6px; margin-bottom: 14px; }
+    .uyarilar h4 { margin: 0 0 4px; }
+    .uyarilar ul { margin: 0; padding-left: 18px; }
+    .indirme-listesi { list-style:none; padding:0; margin:0; display:grid; gap:8px; }
+    .indirme-listesi .button { width:100%; justify-content:flex-start; }
+    .metin-dugme { background:none; border:0; padding:0; color: var(--teal-dark); font-weight:700; text-decoration: underline; }
+    .onceki-ust { display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end; margin-bottom: 14px; }
+    .onceki-ust .field { flex: 1 1 260px; margin-bottom: 0; }
+    .onceki-ust .button { min-height: 46px; }
+    .onceki-liste { list-style:none; padding:0; margin: 0; display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+    .onceki-kart { background:#fff; border:1px solid var(--line); border-radius: 14px; padding: 16px; }
+    .onceki-kart h3 { margin: 0 0 4px; font-size: 1.02rem; }
+    .onceki-kart p { margin: 0 0 12px; font-size: .88rem; }
+    .onceki-dugmeler { display:flex; flex-wrap:wrap; gap: 8px; }
+    .onceki-dugmeler .button { padding: 8px 13px; }
+    .gorsel-gizli { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+    @media (max-width: 700px) {
+      .bina-satiri { grid-template-columns: 1fr 1fr; }
+      .bina-satiri .field:first-child { grid-column: 1 / -1; }
+      .konum-satiri { flex-direction: column; align-items: stretch; }
+    }
     @media (max-width: 850px) {
       .hero-grid, .builder-layout, .access-grid { grid-template-columns: 1fr; }
       .hero-art { min-height: 190px; }
@@ -123,31 +184,54 @@
       html { scroll-behavior: auto; }
       *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
     }
-  </style>
+    </style>
 </head>
 <body>
   <a class="skip-link" href="#main">Ana içeriğe geç</a>
-  <div class="reader-toolbar" role="region" aria-label="Sesli okuma aracı">
-    <strong>Sesli okuma:</strong>
-    <button type="button" id="read-page">Sayfayı sesli oku</button>
-    <button type="button" id="pause-reading" disabled>Duraklat</button>
-    <button type="button" id="resume-reading" disabled>Devam et</button>
-    <button type="button" id="stop-reading" disabled>Okumayı durdur</button>
-    <label for="reading-rate">Okuma hızı</label>
-    <select id="reading-rate" aria-label="Sesli okuma hızı">
-      <option value="0.8">Yavaş</option>
-      <option value="1" selected>Normal</option>
-      <option value="1.2">Hızlı</option>
-    </select>
-    <p class="reader-status" id="reader-status" role="status" aria-live="polite">Sayfa içeriğini dinlemek için “Sayfayı sesli oku” düğmesini kullan.</p>
+
+  <div class="reader-toolbar" role="region" aria-label="Ses araçları">
+    <div class="arac-grup">
+      <strong>Ses:</strong>
+      <button type="button" id="rehber-dugme" aria-pressed="false"
+        data-rehber="Sesli rehberi açar ya da kapatır.">Sesli rehberi başlat</button>
+      <button type="button" id="komut-dugme" aria-pressed="false"
+        data-rehber="Mikrofonla sesli komut vermek için basın. Kısayolu Alt ve K.">Sesli komut ver</button>
+      <button type="button" id="tekrarla" data-rehber="Son mesajı tekrar okur. Kısayolu Alt ve T.">Son mesajı tekrarla</button>
+    </div>
+    <span class="ayirac" aria-hidden="true"></span>
+    <div class="arac-grup">
+      <button type="button" id="sayfayi-oku" data-rehber="Sayfanın tamamını sesli okur.">Sayfayı sesli oku</button>
+      <button type="button" id="okuma-duraklat" disabled>Duraklat</button>
+      <button type="button" id="okuma-devam" disabled>Devam et</button>
+      <button type="button" id="okuma-durdur" disabled>Okumayı durdur</button>
+      <label for="okuma-hizi">Okuma hızı</label>
+      <select id="okuma-hizi" data-rehber="Sesli okumanın hızını seçin. Yukarı ve aşağı ok tuşlarını kullanın.">
+        <option value="0.8">Yavaş</option>
+        <option value="1" selected>Normal</option>
+        <option value="1.2">Hızlı</option>
+        <option value="1.5">Çok hızlı</option>
+      </select>
+    </div>
+    <p class="reader-status" id="ses-durum" role="status" aria-live="polite">Sesli yönlendirme için “Sesli rehberi başlat” düğmesine basın.</p>
+    <details class="kisayollar">
+      <summary>Klavye kısayolları ve sesli komutlar</summary>
+      <ul>
+        <li><kbd>Alt</kbd> + <kbd>K</kbd>: sesli komut ver (Chrome ve Edge’de çalışır, mikrofon izni ister)</li>
+        <li><kbd>Alt</kbd> + <kbd>T</kbd>: son mesajı tekrarla</li>
+        <li><kbd>Esc</kbd>: konuşmayı durdur</li>
+        <li>Örnek komutlar: “yer Yozgat Bozok Üniversitesi”, “alan altı yüz”, “başlık bozok kampüs”, “haritayı üret”, “haritayı anlat”, “indir”, “önceki haritalar”, “yardım”</li>
+      </ul>
+    </details>
   </div>
+
   <header>
     <div class="container nav">
-      <a class="brand" href="#" aria-label="Dokun ve Dinle ana sayfa">
+      <a class="brand" href="#main" aria-label="Dokun ve Dinle ana sayfa">
         <span class="brand-mark" aria-hidden="true">◉</span><span>DOKUN &amp; DİNLE</span>
       </a>
       <nav aria-label="Ana menü">
         <a href="#olustur">Harita oluştur</a>
+        <a href="#onceki">Önceki haritalar</a>
         <a href="#ozellikler">Özellikler</a>
         <a href="#surec">Nasıl çalışır?</a>
         <a href="#erisilebilirlik">Erişilebilirlik</a>
@@ -161,13 +245,13 @@
         <div>
           <div class="eyebrow">Erişilebilir haritalar platformu</div>
           <h1>Dünyayı dokunarak keşfet, dinleyerek tanı.</h1>
-          <p>Kendi dokunsal haritanı oluştur. Yolları, yapıları ve çevrendeki önemli noktaları parmaklarınla keşfet; bilgileri sesli olarak dinle.</p>
-          <a class="button button-light" href="#olustur">Haritamı oluşturmaya başla&nbsp; →</a>
+          <p>Kendi dokunsal haritanı oluştur. Yolları ve yapıları parmaklarınla keşfet; haritada neler olduğunu sesli olarak dinle.</p>
+          <a class="button button-light" href="#olustur">Haritamı oluşturmaya başla&nbsp;<span aria-hidden="true">→</span></a>
         </div>
-        <div class="hero-art" aria-label="Kabartmalı harita fikrini temsil eden çizim">
+        <div class="hero-art">
           <svg viewBox="0 0 430 270" role="img" aria-labelledby="map-title map-desc">
             <title id="map-title">Dokunsal harita illüstrasyonu</title>
-            <desc id="map-desc">Yollar, binalar, parklar ve dokunma noktaları bulunan stilize harita.</desc>
+            <desc id="map-desc">Yollar, binalar ve dokunma noktaları bulunan stilize harita.</desc>
             <rect x="24" y="20" width="382" height="230" rx="20" fill="#e8f2ed"/>
             <path d="M15 90 L420 175 M110 5 L270 275 M5 220 L420 50 M345 0 L170 275" stroke="#b5c9bd" stroke-width="24" fill="none"/>
             <path d="M15 90 L420 175 M110 5 L270 275 M5 220 L420 50 M345 0 L170 275" stroke="#fff" stroke-width="3" stroke-dasharray="8 7" fill="none"/>
@@ -186,73 +270,117 @@
         <div class="section-head">
           <div class="section-kicker">Kişisel harita tasarımı</div>
           <h2>Kendi haritanı oluştur</h2>
-          <p>Haritalamak istediğin bölgeyi ve keşfetmek istediğin detayları belirle. Seçimlerin doğrultusunda bir tasarım özeti oluştur.</p>
+          <p>Haritası çıkarılacak yeri ve harita ayarlarını belirle. Sistem bina ve yolları OpenStreetMap’ten alıp 3D yazıcıda basılabilen, Braille etiketli bir model hazırlar.</p>
         </div>
         <div class="builder-layout">
-          <form class="card" id="map-form">
+          <form class="card" id="harita-formu" novalidate>
             <div class="step-title">
               <span class="step-number" aria-hidden="true">1</span>
-              <div><h3>Bölgeni seç</h3><p>Haritasını oluşturmak istediğin konumu belirt.</p></div>
+              <div><h3>Yeri seç</h3><p>Haritası çıkarılacak yerin adını yaz ya da koordinat gir.</p></div>
             </div>
-            <div class="form-grid">
-              <label class="field" for="city">Şehir
-                <input id="city" name="city" autocomplete="address-level1" placeholder="Örn. Yozgat" required>
+            <div class="konum-satiri">
+              <label class="field" for="yer">Yer adı veya adres
+                <span class="ipucu" id="yer-ipucu">İlçe ve şehri de yazmak doğru yeri bulmayı kolaylaştırır. Örnek: Bozok Üniversitesi, Yozgat</span>
+                <input id="yer" name="yer" autocomplete="off" aria-describedby="yer-ipucu yer-hata"
+                  placeholder="Örn. Yozgat Bozok Üniversitesi"
+                  data-rehber="Haritası çıkarılacak yerin adını yazın, örneğin Yozgat Bozok Üniversitesi. Sonra Konumu bul düğmesine geçin. Sesli komutla da, yer ve ardından yer adını söyleyebilirsiniz.">
               </label>
-              <label class="field" for="district">İlçe
-                <input id="district" name="district" autocomplete="address-level2" placeholder="Örn. Merkez">
-              </label>
+              <button type="button" class="button button-outline" id="konum-bul"
+                data-rehber="Yazdığınız yeri haritada arar ve bulunan yerin tam adını okur.">Konumu bul</button>
             </div>
-            <label class="field" for="area">Bölge veya adres
-              <input id="area" name="area" placeholder="Örn. Üniversite kampüsü, şehir merkezi" required>
-            </label>
+            <span class="hata" id="yer-hata"></span>
+            <p class="bulunan" id="bulunan-yer"></p>
+
+            <details class="koordinat">
+              <summary>Koordinatla gir (isteğe bağlı)</summary>
+              <p class="ipucu" id="koordinat-ipucu">Google Haritalar’da bir noktaya sağ tıklayınca çıkan ilk satırdaki iki sayı enlem ve boylamdır. Konumu bul düğmesi bu alanları kendisi doldurur.</p>
+              <div class="form-grid">
+                <label class="field" for="enlem">Enlem
+                  <input id="enlem" name="enlem" inputmode="decimal" autocomplete="off" aria-describedby="koordinat-ipucu enlem-hata"
+                    placeholder="Örn. 39.775014" data-rehber="Harita merkezinin enlemini yazın. Yer adı yazdıysanız boş bırakabilirsiniz.">
+                  <span class="hata" id="enlem-hata"></span>
+                </label>
+                <label class="field" for="boylam">Boylam
+                  <input id="boylam" name="boylam" inputmode="decimal" autocomplete="off" aria-describedby="koordinat-ipucu boylam-hata"
+                    placeholder="Örn. 34.796303" data-rehber="Harita merkezinin boylamını yazın.">
+                  <span class="hata" id="boylam-hata"></span>
+                </label>
+              </div>
+            </details>
 
             <div class="step-title">
               <span class="step-number" aria-hidden="true">2</span>
-              <div><h3>Harita içeriğini belirle</h3><p>Haritanda bulunmasını istediğin ögeleri seç.</p></div>
+              <div><h3>Harita ayarlarını seç</h3><p>Alan büyüklüğü, başlık ve kabartma.</p></div>
             </div>
-            <fieldset>
-              <legend>Harita ögeleri (en az birini seç)</legend>
-              <div class="check-grid">
-                <label class="check-item"><input type="checkbox" name="feature" value="Yollar ve sokaklar" checked> Yollar ve sokaklar</label>
-                <label class="check-item"><input type="checkbox" name="feature" value="Binalar ve yapılar" checked> Binalar ve yapılar</label>
-                <label class="check-item"><input type="checkbox" name="feature" value="Parklar ve yeşil alanlar"> Parklar ve yeşil alanlar</label>
-                <label class="check-item"><input type="checkbox" name="feature" value="Toplu taşıma durakları"> Toplu taşıma durakları</label>
-                <label class="check-item"><input type="checkbox" name="feature" value="Eğitim kurumları"> Eğitim kurumları</label>
-                <label class="check-item"><input type="checkbox" name="feature" value="Sağlık kuruluşları"> Sağlık kuruluşları</label>
-                <label class="check-item"><input type="checkbox" name="feature" value="Önemli yönlendirme noktaları"> Yönlendirme noktaları</label>
-                <label class="check-item"><input type="checkbox" name="feature" value="Yaya geçitleri"> Yaya geçitleri</label>
-              </div>
-            </fieldset>
-
-            <div class="step-title">
-              <span class="step-number" aria-hidden="true">3</span>
-              <div><h3>Harita özelliklerini seç</h3><p>Haritanın fiziksel ve işitsel özelliklerini belirle.</p></div>
-            </div>
-            <label class="field" for="relief">Kabartma seviyesi
-              <select id="relief" name="relief">
-                <option value="Standart kabartma">Standart</option>
-                <option value="Belirgin kabartma">Belirgin</option>
-                <option value="Yüksek kabartma">Yüksek</option>
+            <label class="field" for="alan">Alan büyüklüğü
+              <span class="ipucu" id="alan-ipucu">Küçük alan daha ayrıntılı, büyük alan daha kalabalık bir harita verir.</span>
+              <select id="alan" name="alan" aria-describedby="alan-ipucu alan-hata"
+                data-rehber="Haritanın kaç metrelik bir alanı göstereceğini seçin. Önerilen altı yüz metredir. Ok tuşlarıyla değiştirin.">
+                <option value="300">300 m × 300 m (çok ayrıntılı)</option>
+                <option value="400">400 m × 400 m</option>
+                <option value="600" selected>600 m × 600 m (önerilen)</option>
+                <option value="800">800 m × 800 m</option>
+                <option value="1000">1000 m × 1000 m</option>
+                <option value="1500">1500 m × 1500 m</option>
+                <option value="2000">2000 m × 2000 m (az ayrıntılı)</option>
+              </select>
+              <span class="hata" id="alan-hata"></span>
+            </label>
+            <label class="field" for="baslik">Harita başlığı (isteğe bağlı)
+              <span class="ipucu" id="baslik-ipucu">Plakanın üst kısmına Braille ile yazılır. En fazla 40 karakter.</span>
+              <input id="baslik" name="baslik" maxlength="40" autocomplete="off" aria-describedby="baslik-ipucu baslik-braille baslik-hata"
+                placeholder="Örn. bozok kampüs" data-rehber="Haritanın üstüne Braille ile yazılacak kısa başlığı yazın. Boş bırakabilirsiniz.">
+              <output class="braille-cikti" id="baslik-braille" for="baslik"></output>
+              <span class="hata" id="baslik-hata"></span>
+            </label>
+            <label class="field" for="kabartma">Kabartma seviyesi
+              <select id="kabartma" name="kabartma" data-rehber="Binaların ne kadar yüksek kabartılacağını seçin.">
+                <option value="standart">Standart (binalar 3 mm)</option>
+                <option value="belirgin">Belirgin (binalar 3,5 mm)</option>
+                <option value="yuksek">Yüksek (binalar 4 mm)</option>
               </select>
             </label>
             <label class="option">
-              <input type="checkbox" id="audio" checked>
-              <span><strong>Sesli bilgilendirme</strong><small>Dokunma noktalarına sesli açıklama ekle.</small></span>
+              <input type="checkbox" id="braille-anahtar" checked
+                data-rehber="İşaretliyse adı bilinen binaların üzerine a, b, c gibi Braille harfleri konur ve adlar ayrı bir plakada listelenir. Değiştirmek için boşluk tuşuna basın.">
+              <span><strong>Binalara Braille anahtarları koy</strong><small>Adı bilinen binaların üzerine a, b, c… harfleri konur; adlar ayrı bir lejant plakasında yazılır.</small></span>
             </label>
-            <label class="option">
-              <input type="checkbox" id="braille" checked>
-              <span><strong>Braille işaretleri</strong><small>Uygun alanlarda Braille etiketleri kullan.</small></span>
-            </label>
-            <button class="button button-primary" type="submit">Harita tasarımımı oluştur&nbsp; →</button>
-            <p class="status" id="form-status" role="status" aria-live="polite"></p>
+
+            <div class="step-title" style="margin-top:20px">
+              <span class="step-number" aria-hidden="true">3</span>
+              <div><h3>Bina adları (isteğe bağlı)</h3><p>OpenStreetMap’te adı olmayan binalara ad ver. Eklediğin sırayla a, b, c… anahtarlarını alırlar.</p></div>
+            </div>
+            <ul class="bina-listesi" id="bina-listesi" aria-label="Eklenen bina adları"></ul>
+            <button type="button" class="button button-outline" id="bina-ekle"
+              data-rehber="Yeni bir bina adı satırı ekler. Her satırda ad, enlem ve boylam yazılır.">+ Bina adı ekle</button>
+
+            <details class="gelismis" style="margin-top:20px">
+              <summary>Gelişmiş seçenekler</summary>
+              <label class="option">
+                <input type="checkbox" id="yeniden-uret" data-rehber="İşaretliyse aynı harita daha önce hazırlanmış olsa bile baştan üretilir.">
+                <span><strong>Haritayı baştan üret</strong><small>Aynı ayarlarla daha önce hazırlanmış harita varsa kayıttan getirmek yerine yeniden üretir.</small></span>
+              </label>
+              <label class="option">
+                <input type="checkbox" id="ornek-veri" data-rehber="Geliştirme için. İşaretliyse internet kullanılmadan örnek veriyle harita üretilir.">
+                <span><strong>İnternetsiz deneme (örnek veri)</strong><small>Geliştirme ve test için; gerçek bir yer yerine yapay örnek veri kullanılır.</small></span>
+              </label>
+            </details>
+
+            <div class="form-alt">
+              <button class="button button-primary" type="submit" id="uret-dugme"
+                data-rehber="Haritayı hazırlar. Bu işlem bir ile beş dakika sürebilir; hazır olduğunda haber verilir.">Haritayı üret</button>
+              <button class="button button-outline" type="button" id="tekrar-dene" hidden
+                data-rehber="Haritayı aynı ayarlarla yeniden ister.">Tekrar dene</button>
+            </div>
+            <p class="status" id="form-durum" role="status" aria-live="polite"></p>
           </form>
 
-          <aside class="card map-card" aria-label="Harita tasarım ön izlemesi">
-            <h3 style="margin-top:0">Harita ön izlemesi</h3>
-            <div class="map-canvas">
+          <aside class="card map-card" aria-labelledby="onizleme-baslik">
+            <h3 id="onizleme-baslik" style="margin-top:0">Harita önizlemesi</h3>
+            <div class="map-canvas" id="onizleme-kutusu">
               <svg viewBox="0 0 600 300" role="img" aria-labelledby="preview-title preview-desc">
                 <title id="preview-title">Örnek dokunsal harita görünümü</title>
-                <desc id="preview-desc">Yollar, binalar, park ve işaretlenmiş konumlar içeren örnek şema. Gerçek harita verisi değildir.</desc>
+                <desc id="preview-desc">Yollar ve binalar içeren örnek şema. Gerçek harita verisi değildir.</desc>
                 <rect width="600" height="300" fill="#edf1e9"/>
                 <path d="M-20 65 L620 190 M100 -10 L350 320 M-20 245 L620 30 M490 -10 L210 320" stroke="#fff" stroke-width="25" fill="none"/>
                 <path d="M-20 65 L620 190 M100 -10 L350 320 M-20 245 L620 30 M490 -10 L210 320" stroke="#aab9aa" stroke-width="2" stroke-dasharray="7 7" fill="none"/>
@@ -261,21 +389,37 @@
                 <rect x="390" y="190" width="120" height="55" rx="7" fill="#d7c9a8"/>
                 <rect x="55" y="176" width="90" height="53" rx="7" fill="#d7c9a8"/>
                 <circle cx="270" cy="135" r="13" fill="#176b67"/><circle cx="270" cy="135" r="5" fill="white"/>
-                <circle cx="180" cy="205" r="9" fill="#bb8737"/><circle cx="465" cy="155" r="9" fill="#bb8737"/>
-                <g font-size="14" fill="#294d43" font-weight="600"><text x="65" y="70">Bina</text><text x="412" y="76">Yapı</text><text x="420" y="222">Park</text><text x="70" y="207">Durak</text></g>
               </svg>
             </div>
-            <p class="map-caption">Bu görsel yalnızca örnek şemadır; henüz gerçek coğrafi veri içermez.</p>
-            <div class="summary" id="summary" aria-live="polite">
-              <span class="summary-empty">Henüz tasarım oluşturulmadı. Bölge ve harita özelliklerini seçerek başlayabilirsin.</span>
+            <p class="map-caption" id="onizleme-yazi">Bu görsel yalnızca örnek şemadır. Harita üretildiğinde gerçek önizleme burada görünür.</p>
+            <div class="sonuc" id="sonuc">
+              <p class="summary-empty muted">Henüz harita üretilmedi. Yeri ve ayarları seçip “Haritayı üret” düğmesine bas.</p>
             </div>
-            <button class="button button-outline" id="download" type="button" disabled style="width:100%;margin-top:13px">Tasarım özetini indir</button>
           </aside>
         </div>
       </div>
     </section>
 
-    <section id="ozellikler" style="background:#eef3ef">
+    <section id="onceki" style="background:#eef3ef">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-kicker">Kayıtlı haritalar</div>
+          <h2>Önceki haritalar</h2>
+          <p>Daha önce hazırlanan haritalar burada saklanır. Yeniden üretmeden açabilir, modelini indirebilir ya da silebilirsin.</p>
+        </div>
+        <form class="onceki-ust" id="onceki-form" role="search" aria-label="Önceki haritalarda ara">
+          <label class="field" for="onceki-ara">Yer, başlık veya bina adıyla ara
+            <input id="onceki-ara" type="search" autocomplete="off" placeholder="Örn. kampüs"
+              data-rehber="Önceki haritalarda aramak için bir kelime yazıp Enter'a basın. Boş bırakırsanız hepsi listelenir.">
+          </label>
+          <button class="button button-primary" type="submit">Ara</button>
+        </form>
+        <p class="status" id="onceki-durum" role="status" aria-live="polite" style="margin-bottom:12px"></p>
+        <ul class="onceki-liste" id="onceki-liste" aria-label="Kayıtlı haritalar listesi"></ul>
+      </div>
+    </section>
+
+    <section id="ozellikler">
       <div class="container">
         <div class="section-head">
           <div class="section-kicker">Platform özellikleri</div>
@@ -283,15 +427,15 @@
           <p>Dokunsal ve sesli bilginin bir araya geldiği, erişilebilirlik odaklı bir deneyim.</p>
         </div>
         <div class="feature-grid">
-          <article class="feature-card"><div class="feature-icon" aria-hidden="true">⌖</div><h3>Bölge seçimi</h3><p>Kullanıcı istediği şehir, ilçe veya bölgeyi belirleyebilir.</p></article>
-          <article class="feature-card"><div class="feature-icon" aria-hidden="true">▧</div><h3>3D kabartma</h3><p>Coğrafi ögeler dokunarak ayırt edilebilecek fiziksel formlara dönüştürülür.</p></article>
-          <article class="feature-card"><div class="feature-icon" aria-hidden="true">♫</div><h3>Sesli etkileşim</h3><p>Haritadaki belirli noktalara dokunulduğunda ilgili sesli bilgi sunulur.</p></article>
-          <article class="feature-card"><div class="feature-icon" aria-hidden="true">⠿</div><h3>Braille desteği</h3><p>Uygun alanlarda Braille işaretleriyle ek bilgi sağlanır.</p></article>
+          <article class="feature-card"><div class="feature-icon" aria-hidden="true">⌖</div><h3>Bölge seçimi</h3><p>Yer adı söylenerek, yazılarak ya da koordinatla seçilir.</p></article>
+          <article class="feature-card"><div class="feature-icon" aria-hidden="true">▧</div><h3>3D kabartma</h3><p>Binalar ve yollar dokunarak ayırt edilebilecek farklı yüksekliklere dönüştürülür.</p></article>
+          <article class="feature-card"><div class="feature-icon" aria-hidden="true">♫</div><h3>Sesli kullanım</h3><p>Site her adımı sesli anlatır, sesli komutları anlar ve hazırlanan haritayı sesli tanıtır.</p></article>
+          <article class="feature-card"><div class="feature-icon" aria-hidden="true">⠿</div><h3>Braille desteği</h3><p>Başlık ve bina adları Türkçe Braille ile plakaya kabartılır.</p></article>
         </div>
       </div>
     </section>
 
-    <section id="surec">
+    <section id="surec" style="background:#eef3ef">
       <div class="container">
         <div class="section-head">
           <div class="section-kicker">Üretim süreci</div>
@@ -300,14 +444,14 @@
         </div>
         <div class="process">
           <article class="process-card"><div class="big" aria-hidden="true">⌖</div><h3>01. Bölge seçimi</h3><p>Kullanıcı erişilebilir arayüzden haritalamak istediği bölgeyi seçer.</p></article>
-          <article class="process-card"><div class="big" aria-hidden="true">▧</div><h3>02. 3D modelleme</h3><p>Coğrafi veriler işlenerek kabartmalı harita modeli hazırlanır.</p></article>
+          <article class="process-card"><div class="big" aria-hidden="true">▧</div><h3>02. 3D modelleme</h3><p>OpenStreetMap verisi işlenerek kabartmalı harita modeli (STL) hazırlanır.</p></article>
           <article class="process-card"><div class="big" aria-hidden="true">◈</div><h3>03. 3D baskı</h3><p>Model, PLA filament kullanılarak FDM teknolojisiyle üretilir.</p></article>
           <article class="process-card"><div class="big" aria-hidden="true">♫</div><h3>04. Sesli etkileşim</h3><p>ESP32 ve DFPlayer Mini, dokunulan noktaya ait sesli bilgiyi oynatır.</p></article>
         </div>
         <div class="hardware" style="margin-top:25px">
           <h3 style="margin:0;text-align:center">Fiziksel sistemin donanım akışı</h3>
           <p class="muted" style="text-align:center;margin:4px 0 0">Web arayüzünden bağımsız çalışan sesli katman</p>
-          <div class="hardware-flow" aria-label="Bakır bant, ESP32, DFPlayer Mini ve hoparlör sıralaması">
+          <div class="hardware-flow" role="group" aria-label="Bakır bant, ESP32, DFPlayer Mini ve hoparlör sıralaması">
             <div class="hardware-node">Bakır bant<small>Dokunma algılama</small></div><span class="arrow" aria-hidden="true">→</span>
             <div class="hardware-node">ESP32<small>Kontrol birimi</small></div><span class="arrow" aria-hidden="true">→</span>
             <div class="hardware-node">DFPlayer Mini<small>Ses oynatma</small></div><span class="arrow" aria-hidden="true">→</span>
@@ -317,25 +461,26 @@
       </div>
     </section>
 
-    <section id="erisilebilirlik" style="background:#eef3ef">
+    <section id="erisilebilirlik">
       <div class="container access-grid">
         <div class="section-head" style="margin:0">
           <div class="section-kicker">Herkes için erişilebilirlik</div>
           <h2>Engelleri değil, imkânları tasarlıyoruz.</h2>
-          <p>Platform, görme engelli kullanıcıların ekran okuyucu ve klavye yardımıyla temel işlemleri gerçekleştirebilmesini hedefler.</p>
-          <button type="button" class="button button-primary" id="contrast-toggle" aria-pressed="false" style="margin-top:12px">Yüksek kontrast görünümünü aç</button>
+          <p>Platform, görme engelli kullanıcıların sesli rehber, sesli komut, ekran okuyucu ve klavye ile tüm işlemleri yapabilmesini hedefler.</p>
+          <button type="button" class="button button-primary" id="contrast-toggle" aria-pressed="false" style="margin-top:12px"
+            data-rehber="Az gören kullanıcılar için renkleri daha belirgin yapar.">Yüksek kontrast görünümünü aç</button>
         </div>
         <div class="card">
           <h3 style="margin-top:0">Erişilebilirlik özellikleri</h3>
           <ul class="access-list">
-            <li>Form alanlarında açıklayıcı etiketler</li>
+            <li>Her adımı anlatan sesli rehber ve Türkçe sesli komutlar</li>
+            <li>Hazırlanan haritanın sesli anlatımı</li>
+            <li>Form alanlarında açıklayıcı etiketler ve sesli hata bildirimleri</li>
+            <li>Klavyeyle erişilebilir düğmeler, kısayollar ve gezinme</li>
             <li>Ekran okuyucu için anlamlı başlıklar ve durum bildirimleri</li>
-            <li>Klavyeyle erişilebilir butonlar ve gezinme</li>
-            <li>Görsel olmayan metinsel açıklamalar</li>
-            <li>Yüksek kontrast ve okunabilir metinler</li>
-            <li>Mobil cihazlara uyumlu, duyarlı tasarım</li>
+            <li>Yüksek kontrast ve okunabilir metinler, mobil uyumlu tasarım</li>
           </ul>
-          <p class="muted" style="font-size:.82rem;margin-bottom:0">Not: Bu özellikler erişilebilir tasarım hedefleridir. WCAG uyumluluğu için gerçek kullanıcı testleri ve yardımcı teknolojilerle doğrulama gerekir.</p>
+          <p class="muted" style="font-size:.82rem;margin-bottom:0">Not: WCAG uyumluluğu için gerçek kullanıcı testleri ve yardımcı teknolojilerle doğrulama gerekir.</p>
         </div>
       </div>
     </section>
@@ -349,155 +494,18 @@
     </div>
   </footer>
 
+  <script src="ses.js"></script>
+  <script src="uygulama.js"></script>
   <script>
     "use strict";
-
-    const form = document.getElementById("map-form");
-    const status = document.getElementById("form-status");
-    const summary = document.getElementById("summary");
-    const downloadButton = document.getElementById("download");
-    const contrastButton = document.getElementById("contrast-toggle");
-    const readPageButton = document.getElementById("read-page");
-    const pauseReadingButton = document.getElementById("pause-reading");
-    const resumeReadingButton = document.getElementById("resume-reading");
-    const stopReadingButton = document.getElementById("stop-reading");
-    const readingRate = document.getElementById("reading-rate");
-    const readerStatus = document.getElementById("reader-status");
-    let currentSummary = "";
-
-    const speechSupported = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
-    let pageUtterance = null;
-
-    if (!speechSupported) {
-      readPageButton.disabled = true;
-      readerStatus.textContent = "Bu tarayıcı sesli okuma özelliğini desteklemiyor. NVDA veya VoiceOver gibi bir ekran okuyucu kullanabilirsin.";
-    }
-
-    function updateReaderButtons(isReading) {
-      pauseReadingButton.disabled = !isReading;
-      resumeReadingButton.disabled = !isReading;
-      stopReadingButton.disabled = !isReading;
-    }
-
-    readPageButton.addEventListener("click", function () {
-      if (!speechSupported) return;
-      window.speechSynthesis.cancel();
-      const mainContent = document.getElementById("main").innerText;
-      pageUtterance = new SpeechSynthesisUtterance(mainContent);
-      pageUtterance.lang = "tr-TR";
-      pageUtterance.rate = Number(readingRate.value);
-      pageUtterance.onstart = function () {
-        readerStatus.textContent = "Sayfa sesli okunuyor.";
-        updateReaderButtons(true);
-      };
-      pageUtterance.onend = function () {
-        readerStatus.textContent = "Sayfanın okunması tamamlandı.";
-        updateReaderButtons(false);
-      };
-      pageUtterance.onerror = function () {
-        readerStatus.textContent = "Sesli okuma sırasında bir sorun oluştu.";
-        updateReaderButtons(false);
-      };
-      window.speechSynthesis.speak(pageUtterance);
-      readerStatus.textContent = "Sesli okuma başlatılıyor.";
-      updateReaderButtons(true);
-    });
-
-    pauseReadingButton.addEventListener("click", function () {
-      if (speechSupported && window.speechSynthesis.speaking) {
-        window.speechSynthesis.pause();
-        readerStatus.textContent = "Sesli okuma duraklatıldı.";
-      }
-    });
-
-    resumeReadingButton.addEventListener("click", function () {
-      if (speechSupported && window.speechSynthesis.paused) {
-        window.speechSynthesis.resume();
-        readerStatus.textContent = "Sesli okumaya devam ediliyor.";
-      }
-    });
-
-    stopReadingButton.addEventListener("click", function () {
-      if (speechSupported) window.speechSynthesis.cancel();
-      readerStatus.textContent = "Sesli okuma durduruldu.";
-      updateReaderButtons(false);
-    });
-
-    form.addEventListener("submit", function (event) {
-      event.preventDefault();
-
-      const city = document.getElementById("city").value.trim();
-      const district = document.getElementById("district").value.trim();
-      const area = document.getElementById("area").value.trim();
-      const features = Array.from(document.querySelectorAll('input[name="feature"]:checked'))
-        .map((input) => input.value);
-
-      if (!city || !area) {
-        status.textContent = "Lütfen şehir ve bölge bilgilerini doldur.";
-        return;
-      }
-      if (features.length === 0) {
-        status.textContent = "Lütfen en az bir harita ögesi seç.";
-        return;
-      }
-
-      const relief = document.getElementById("relief").value;
-      const audio = document.getElementById("audio").checked;
-      const braille = document.getElementById("braille").checked;
-
-      const lines = [
-        "DOKUN & DİNLE – HARİTA TASARIM ÖZETİ",
-        "Şehir: " + city,
-        "İlçe: " + (district || "Belirtilmedi"),
-        "Bölge: " + area,
-        "Harita ögeleri: " + features.join(", "),
-        "Kabartma: " + relief,
-        "Sesli bilgilendirme: " + (audio ? "Evet" : "Hayır"),
-        "Braille: " + (braille ? "Evet" : "Hayır"),
-        "Üretim yaklaşımı: FDM 3D baskı ve PLA filament",
-        "Donanım: ESP32, bakır bant, DFPlayer Mini ve hoparlör",
-        "",
-        "Not: Bu özet tasarım gereksinimlerini içerir. Gerçek harita verisi, 3D model ve ses dosyaları ayrıca hazırlanmalıdır."
-      ];
-      currentSummary = lines.join("\n");
-
-      summary.replaceChildren();
-      const title = document.createElement("strong");
-      title.textContent = "Tasarım özeti oluşturuldu";
-      const location = document.createElement("p");
-      location.textContent = city + (district ? ", " + district : "") + " – " + area;
-      const list = document.createElement("ul");
-      [...features, relief, audio ? "Sesli bilgilendirme açık" : "Sesli bilgilendirme kapalı",
-        braille ? "Braille işaretleri açık" : "Braille işaretleri kapalı"].forEach((item) => {
-        const li = document.createElement("li");
-        li.textContent = item;
-        list.appendChild(li);
-      });
-      summary.append(title, location, list);
-      status.textContent = "Tasarım özeti başarıyla oluşturuldu. İstersen özeti indirebilirsin.";
-      downloadButton.disabled = false;
-    });
-
-    downloadButton.addEventListener("click", function () {
-      if (!currentSummary) return;
-      const blob = new Blob(["\uFEFF" + currentSummary], { type: "text/plain;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "dokun-dinle-harita-tasarimi.txt";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(url);
-    });
-
-    contrastButton.addEventListener("click", function () {
-      const enabled = contrastButton.getAttribute("aria-pressed") !== "true";
-      document.body.classList.toggle("high-contrast", enabled);
-      contrastButton.setAttribute("aria-pressed", String(enabled));
-      contrastButton.textContent = enabled
-        ? "Normal görünüme dön"
-        : "Yüksek kontrast görünümünü aç";
+    // Yüksek kontrast düğmesi
+    const kontrast = document.getElementById("contrast-toggle");
+    kontrast.addEventListener("click", function () {
+      const acik = kontrast.getAttribute("aria-pressed") !== "true";
+      document.body.classList.toggle("high-contrast", acik);
+      kontrast.setAttribute("aria-pressed", String(acik));
+      kontrast.textContent = acik ? "Normal görünüme dön" : "Yüksek kontrast görünümünü aç";
+      Ses.duyur(acik ? "Yüksek kontrast açıldı." : "Normal görünüme dönüldü.");
     });
   </script>
 </body>

@@ -51,11 +51,36 @@ def osm_den_cek(enlem, boylam, alan_m, deneme=3):
     raise RuntimeError(f"OpenStreetMap verisi alınamadı. Son hata: {son_hata}")
 
 
+def yer_bul(yer_adi):
+    """Yer adını arar; (enlem, boylam, bulunan yerin tam adı) döndürür.
+
+    Bulunan yerin tam adı kullanıcıya gösterilir/okunur; böylece yanlış yer bulunduysa fark edilir.
+    """
+    import requests
+
+    try:
+        cevap = requests.get(
+            "https://nominatim.openstreetmap.org/search",
+            params={"q": yer_adi, "format": "json", "limit": 1, "accept-language": "tr"},
+            headers={"User-Agent": "DokunsalHaritaUretici/0.5 (Yozgat Bozok Universitesi ogrenci projesi)"},
+            timeout=20,
+        )
+        cevap.raise_for_status()
+        sonuclar = cevap.json()
+    except Exception:
+        # Nominatim'e doğrudan ulaşılamazsa osmnx ile dene (tam ad dönmez).
+        import osmnx as ox
+        enlem, boylam = ox.geocode(yer_adi)
+        return enlem, boylam, None
+    if not sonuclar:
+        raise ValueError(f"'{yer_adi}' bulunamadı")
+    s = sonuclar[0]
+    return float(s["lat"]), float(s["lon"]), s.get("display_name")
+
+
 def yer_adindan_koordinat(yer_adi):
     """Yer adını (ör. 'Yozgat Bozok Üniversitesi') enlem/boylama çevirir."""
-    import osmnx as ox
-
-    enlem, boylam = ox.geocode(yer_adi)
+    enlem, boylam, _ = yer_bul(yer_adi)
     return enlem, boylam
 
 
