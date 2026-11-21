@@ -1,24 +1,25 @@
 # Web Arayüzü (frontend)
 
-Web arayüzü dosyaları bu klasöre konur. Giriş sayfası `index.html` olmalıdır.
+Sunucu `backend` klasöründe çalıştırıldığında bu site otomatik olarak http://127.0.0.1:8000 adresinden açılır. Ayrı bir sunucu gerekmez.
+
+## Dosyalar
+
+| Dosya | İçerik |
+|---|---|
+| `index.html` | Sayfa yapısı: harita formu, önizleme ve sonuç, önceki haritalar, proje hakkında |
+| `stil.css` | Görünüm (renk teması, yazı tipi, düzen) |
+| `uygulama.js` | Backend bağlantısı: konum arama, Braille önizleme, harita üretme, sonuç ekranı, önceki haritalar |
+| `ses.js` | Ses katmanı: sesli rehber, sesli komut, sayfayı sesli okuma, haritayı sesli anlatma |
+| `fonts/` | Atkinson Hyperlegible yazı tipi (Braille Institute, SIL OFL lisansı) |
+| `gorseller/` | Örnek çıktı görseli |
 
 ## Backend'e bağlanma
 
-- Sunucu `backend` klasöründe çalıştırıldığında bu klasördeki site otomatik olarak http://127.0.0.1:8000 adresinden açılır. Ayrı bir sunucu gerekmez.
-- API isteklerinde tam adres yerine göreli adres kullanılır, örneğin:
+API isteklerinde göreli adres kullanılır (`/api/harita` gibi). Uç noktalar, istek/yanıt biçimleri ve hata kodları: `backend/API_BELGESI.docx`. Denemek için: http://127.0.0.1:8000/docs (internetsiz deneme için istekte `"ornek_veri": true`).
 
-```js
-const cevap = await fetch("/api/harita", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ yer: "Yozgat Bozok Üniversitesi", alan_m: 600, baslik: "bozok kampüs" }),
-});
-const sonuc = await cevap.json();
-```
+## Erişilebilirlik ilkeleri
 
-- Uç noktalar, istek/yanıt biçimleri, hata kodları ve erişilebilirlik gereksinimleri: `backend/API_BELGESI.docx`
-- Uç noktaları denemek için: http://127.0.0.1:8000/docs (internetsiz deneme için istekte `"ornek_veri": true`)
-
-## Derleme aracı kullanılırsa
-
-React, Vite vb. kullanılırsa derlenmiş çıktı `frontend/dist/` klasörüne alınmalıdır. Sunucu önce `dist/index.html` dosyasına bakar. Bu durumda `node_modules/` klasörü GitHub'a gönderilmez (`.gitignore` içinde var).
+- Asıl kullanım ekran okuyucu (NVDA, JAWS, VoiceOver, TalkBack) ve klavyeyle. Her alanın görünür etiketi var, durum mesajları `role="status"` ile bildirilir, hatalı alan işaretlenip odak oraya taşınır.
+- Sesli rehber isteğe bağlıdır ve kendiliğinden başlamaz (ekran okuyucuyla üst üste konuşmaması için).
+- Sesli komut: <kbd>Alt</kbd>+<kbd>K</kbd> (Chrome / Edge). Yeni komut eklemek için `uygulama.js` içindeki `Ses.komutEkle(...)` satırlarına bakın.
+- Yeni bir alan eklenirse `data-rehber="..."` özelliğiyle sesli rehberin okuyacağı açıklama yazılır.

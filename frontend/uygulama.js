@@ -365,9 +365,11 @@
     const durum = el("onceki-durum");
     try {
       const v = await istek("/api/haritalar?adet=50" + (ara ? "&ara=" + encodeURIComponent(ara) : ""));
-      liste.replaceChildren(...v.haritalar.map(oncekiKarti));
-      durum.textContent = v.toplam === 0
-        ? (ara ? `"${ara}" için kayıtlı harita bulunamadı.` : "Henüz kayıtlı harita yok.")
+      const bosMesaj = ara ? `"${ara}" için kayıtlı harita bulunamadı.` : "Henüz kayıtlı harita yok.";
+      liste.replaceChildren(...(v.haritalar.length
+        ? v.haritalar.map(oncekiKarti)
+        : [yeni("tr", { class: "tablo-bos" }, yeni("td", { colspan: "5", text: bosMesaj }))]));
+      durum.textContent = v.toplam === 0 ? bosMesaj
         : `${v.toplam} kayıtlı harita` + (ara ? ` ("${ara}" araması)` : "") + ".";
       return v;
     } catch (h) {
@@ -382,19 +384,20 @@
 
   function oncekiKarti(h) {
     const ad = oncekiAdi(h);
-    const li = yeni("li", { class: "onceki-kart" },
-      yeni("h3", { text: ad }),
-      yeni("p", { class: "muted" },
-        [h.yer && h.baslik ? h.yer : null, tarihYaz(h.olusturma), `${Math.round(h.alan_m)} m`, `${h.bina_sayisi} bina`,
-          h.anahtarlar.length ? "Anahtarlar: " + h.anahtarlar.map((k) => `${k.anahtar} ${k.ad}`).join(", ") : null]
-          .filter(Boolean).join(" · ")),
-      yeni("div", { class: "onceki-dugmeler" },
+    const altBilgi = [h.yer && h.baslik ? h.yer : null,
+      h.anahtarlar.length ? "Anahtarlar: " + h.anahtarlar.map((k) => `${k.anahtar} ${k.ad}`).join(", ") : null]
+      .filter(Boolean).join(" · ");
+    return yeni("tr", {},
+      yeni("th", { scope: "row" }, ad, altBilgi ? yeni("span", { class: "alt-bilgi", text: altBilgi }) : null),
+      yeni("td", { text: tarihYaz(h.olusturma) }),
+      yeni("td", { text: `${Math.round(h.alan_m)} m` }),
+      yeni("td", { text: String(h.bina_sayisi) }),
+      yeni("td", {}, yeni("div", { class: "onceki-dugmeler" },
         yeni("button", { type: "button", class: "button button-primary", "aria-label": `${ad} haritasını aç`,
           "data-rehber": "Haritanın bilgilerini ve indirme bağlantılarını gösterir.", onclick: () => haritayiAc(h.id) }, "Aç"),
         yeni("a", { class: "button button-outline", href: SUNUCU + h.dosyalar.harita_stl, download: "", "aria-label": `${ad} harita modelini indir (STL)` }, "STL indir"),
         yeni("button", { type: "button", class: "button button-outline", "aria-label": `${ad} haritasını sil`,
-          "data-rehber": "Haritayı ve dosyalarını kalıcı olarak siler. Onay istenir.", onclick: () => haritayiSil(h.id, ad) }, "Sil")));
-    return li;
+          "data-rehber": "Haritayı ve dosyalarını kalıcı olarak siler. Onay istenir.", onclick: () => haritayiSil(h.id, ad) }, "Sil"))));
   }
 
   async function haritayiAc(id) {
